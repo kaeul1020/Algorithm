@@ -1,3 +1,3 @@
-k= int(input())
-array = list(map(int, input().split()))
-print(min(array), max(array))
+_ = input()
+nums = list(map(int, input().split(' ')))
+print(min(nums), max(nums), end=' ')
