@@ -1,14 +1,18 @@
-from collections import deque
-
 def solution(numbers, target):
+    answer = 0
     
-    checks = [[] for _ in range(len(numbers)+1)]
-    checks[0].append(0)
+    def dfs(i, cur):
+        cnt = 0
+        
+        if i == len(numbers):
+            return int(cur==target)
+        
+        cnt += dfs(i+1, cur+numbers[i])
+        cnt += dfs(i+1, cur-numbers[i])
+        
+        return cnt 
+        
     
-    for i, n in enumerate([0]+numbers):
-        if i == 0 : continue
-        for c in checks[i-1]:
-            checks[i].append(c+n)
-            checks[i].append(c-n)
+    answer += dfs(0, 0)
     
-    return checks[-1].count(target)
+    return answer
