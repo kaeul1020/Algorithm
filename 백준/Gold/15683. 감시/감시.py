@@ -1,59 +1,48 @@
 import copy
 
 N, M = map(int, input().split())
-cctv = []
-graph = []
+cctv, graph = [], []
 mode = [
     [],
-    [[0], [1], [2], [3]],
-    [[0, 2], [1, 3]],
-    [[0, 1], [1, 2], [2, 3], [0, 3]],
-    [[0, 1, 2], [0, 1, 3], [1, 2, 3], [0, 2, 3]],
-    [[0, 1, 2, 3]],
+    [[0],[1],[2],[3]],
+    [[2,3],[0,1]],
+    [[3,0], [0,2], [2,1], [1, 3]],
+    [[3,0,2],[0,2,1],[2,1,3], [0,3,1]],
+    [[0,1,2,3]]
 ]
 
-# 북 - 동 - 남 - 서
-dx = [-1, 0, 1, 0]
-dy = [0, 1, 0, -1]
+# 상 하 좌 우
+dx = [0,0,-1,1]
+dy = [-1,1,0,0]
 
 for i in range(N):
-    data = list(map(int, input().split()))
-    graph.append(data)
+    graph.append(list(map(int,input().split()))) 
     for j in range(M):
-        if data[j] in range(1,6):
-            cctv.append([data[j], i, j])
+        cctv_num = graph[i][j]
+        if cctv_num in range(1,6):
+            cctv.append((cctv_num, i,j))
 
-def fill(board, mm, x, y):
-    for i in mm:
-        nx = x
-        ny = y
-        while True:
-            nx += dx[i]
-            ny += dy[i]
-            if nx < 0 or ny < 0 or nx >= N or ny >= M:
-                break
-            if board[nx][ny] == 6:
-                break
-            elif board[nx][ny] == 0:
-                board[nx][ny] = '#'
 
-def DFS(depth, arr):
-    global min_value
+def fill(arr, mode_di, x, y):
+    for i in mode_di:
+        nx, ny = x+dx[i], y+dy[i]
+        while 0 <= nx < M and 0 <= ny < N and arr[ny][nx] != 6:
+            if arr[ny][nx] == 0:
+                arr[ny][nx] = "#"
+            nx, ny = nx+dx[i], ny+dy[i]
 
+def DFS(depth, min_zero, arr):
     if depth == len(cctv):
-        count = 0
-        for i in range(N):
-            count += arr[i].count(0)
-        min_value = min(min_value, count)
-        return
-    temp = copy.deepcopy(arr)
-    cctv_num, x, y = cctv[depth]
-    for i in mode[cctv_num]:
-        fill(temp, i, x, y)
-        DFS(depth+1, temp)
+        cnt = 0
+        for n in range(N):
+            cnt += arr[n].count(0)
+        return min(min_zero, cnt)
+    cctv_num, y, x = cctv[depth]
+    for m in mode[cctv_num]:
         temp = copy.deepcopy(arr)
+        fill(temp, m, x, y)
+        min_zero = DFS(depth+1, min_zero, temp)
+        
+    return min_zero
 
-
-min_value = 98765
-DFS(0, graph)
-print(min_value)
+print(DFS(0, N*M+1, graph))      
